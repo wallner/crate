@@ -21,12 +21,13 @@
 
 package io.crate.sql.tree;
 
+import java.util.List;
+
+import javax.annotation.Nullable;
+
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
-
-import javax.annotation.Nullable;
-import java.util.List;
 
 public class CreateTable extends Statement {
 
@@ -34,16 +35,26 @@ public class CreateTable extends Statement {
     private final List<TableElement> tableElements;
     private final List<CrateTableOption> crateTableOptions;
     private final Optional<GenericProperties> properties;
+    private final boolean ignoreExistingTable;
 
     public CreateTable(Table name,
                        List<TableElement> tableElements,
                        @Nullable List<CrateTableOption> crateTableOptions,
-                       @Nullable GenericProperties genericProperties)
-    {
+                       @Nullable GenericProperties genericProperties,
+                       boolean ignoreExistingTable) {
         this.name = name;
         this.tableElements = tableElements;
         this.crateTableOptions = crateTableOptions != null ? crateTableOptions : ImmutableList.<CrateTableOption>of();
         this.properties = Optional.fromNullable(genericProperties);
+        this.ignoreExistingTable = ignoreExistingTable;
+    }
+
+    public CreateTable(Table name,
+                       List<TableElement> tableElements,
+                       @Nullable List<CrateTableOption> crateTableOptions,
+                       @Nullable GenericProperties properties) {
+        this(name, tableElements, crateTableOptions, properties, false);
+
     }
 
     public Table name() {
@@ -63,14 +74,12 @@ public class CreateTable extends Statement {
     }
 
     @Override
-    public <R, C> R accept(AstVisitor<R, C> visitor, C context)
-    {
+    public <R, C> R accept(AstVisitor<R, C> visitor, C context) {
         return visitor.visitCreateTable(this, context);
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return Objects.hashCode(name, tableElements, crateTableOptions, properties);
     }
 
@@ -90,10 +99,10 @@ public class CreateTable extends Statement {
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return Objects.toStringHelper(this)
                 .add("name", name)
+                .add("ignoreExistingTable", ignoreExistingTable)
                 .add("tableElements", tableElements)
                 .add("crateTableOptions", crateTableOptions)
                 .add("properties", properties).toString();

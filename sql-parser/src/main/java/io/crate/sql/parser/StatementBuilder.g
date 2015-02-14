@@ -780,6 +780,14 @@ createTable returns [Statement value]
                                      $crateTableOptionList.value,
                                      $genericProperties.value);
         }
+    | ^(CREATE_TABLE EXISTS namedTable tableElementList crateTableOptionList genericProperties?)
+              {
+                  $value = new CreateTable($namedTable.value,
+                                           $tableElementList.value,
+                                           $crateTableOptionList.value,
+                                           $genericProperties.value,
+                                           true);
+              }
     ;
 
 tableElementList returns [List<TableElement> value = new ArrayList<>()]

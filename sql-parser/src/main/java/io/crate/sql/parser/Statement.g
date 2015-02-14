@@ -805,17 +805,17 @@ copyStatement
 // CREATE STATEMENTS
 
 createStatement
-    : TABLE createTableStmt -> createTableStmt
+    : TABLE ( IF NOT EXISTS )? createTableStmt -> createTableStmt
     | BLOB TABLE createBlobTableStmt -> createBlobTableStmt
     | ALIAS createAliasStmt -> createAliasStmt
     | ANALYZER createAnalyzerStmt -> createAnalyzerStmt
     ;
 
 createTableStmt
-    : table
+    : ( IF NOT EXISTS )? table
       tableElementList
       crateTableOption*
-      (WITH '(' genericProperties ')' )? -> ^(CREATE_TABLE table tableElementList crateTableOption* genericProperties?)
+      (WITH '(' genericProperties ')' )? -> ^(CREATE_TABLE table tableElementList crateTableOption* genericProperties? EXISTS?)
     ;
 
 createBlobTableStmt
